@@ -1,12 +1,14 @@
 package com.ngablak.hijaiyah
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,8 +24,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
 import kotlinx.coroutines.delay
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.ui.semantics.Role
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +38,17 @@ class MainActivity : ComponentActivity() {
                             SplashScreen(navController)
                         }
                         composable("main") {
-                            MainScreen()
+                            MainScreen { navigateToAboutApp() }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun navigateToAboutApp() {
+        val intent = Intent(this, AboutAppActivity::class.java)
+        startActivity(intent)
     }
 }
 
@@ -72,7 +77,7 @@ fun SplashScreen(navController: NavHostController) {
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(navigateToAboutApp: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.bg),
@@ -100,8 +105,27 @@ fun MainScreen() {
                         interactionSource = MutableInteractionSource(),
                         indication = null,
                         onClick = {
-                            // Handle button
+                            // Handle play button click
                         }
+                    ),
+                contentScale = ContentScale.Fit
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 56.dp, end = 16.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.qbox),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clickable(
+                        interactionSource = MutableInteractionSource(),
+                        indication = null,
+                        onClick = navigateToAboutApp
                     ),
                 contentScale = ContentScale.Fit
             )
