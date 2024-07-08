@@ -1,3 +1,4 @@
+// MainActivity.kt
 package com.ngablak.hijaiyah
 
 import android.content.Intent
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
                             SplashScreen(navController)
                         }
                         composable("main") {
-                            MainScreen { navigateToAboutApp() }
+                            MainScreen { navigateToNewActivity() }
                         }
                     }
                 }
@@ -46,8 +47,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun navigateToAboutApp() {
-        val intent = Intent(this, AboutAppActivity::class.java)
+    private fun navigateToNewActivity() {
+        val intent = Intent(this, ContentActivity::class.java)
         startActivity(intent)
     }
 }
@@ -77,7 +78,7 @@ fun SplashScreen(navController: NavHostController) {
 }
 
 @Composable
-fun MainScreen(navigateToAboutApp: () -> Unit) {
+fun MainScreen(navigateToNewActivity: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.bg),
@@ -104,9 +105,7 @@ fun MainScreen(navigateToAboutApp: () -> Unit) {
                     .clickable(
                         interactionSource = MutableInteractionSource(),
                         indication = null,
-                        onClick = {
-                            // Handle play button click
-                        }
+                        onClick = navigateToNewActivity
                     ),
                 contentScale = ContentScale.Fit
             )
@@ -125,7 +124,7 @@ fun MainScreen(navigateToAboutApp: () -> Unit) {
                     .clickable(
                         interactionSource = MutableInteractionSource(),
                         indication = null,
-                        onClick = navigateToAboutApp
+                        onClick = navigateToNewActivity
                     ),
                 contentScale = ContentScale.Fit
             )

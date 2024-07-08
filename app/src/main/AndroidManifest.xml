@@ -13,6 +13,11 @@
         android:theme="@style/Theme.Hijaiyah"
         tools:targetApi="31">
         <activity
+            android:name=".ContentActivity"
+            android:exported="false"
+            android:label="@string/title_activity_content"
+            android:theme="@style/Theme.Hijaiyah" />
+        <activity
             android:name=".AboutAppActivity"
             android:exported="false"
             android:label="@string/title_activity_about_app"
