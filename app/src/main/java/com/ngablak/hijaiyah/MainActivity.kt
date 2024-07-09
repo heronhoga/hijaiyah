@@ -51,6 +51,11 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, ContentActivity::class.java)
         startActivity(intent)
     }
+
+    private fun navigateToAboutAppActivity() {
+        val intent = Intent(this, AboutAppActivity::class.java)
+        startActivity(intent)
+    }
 }
 
 @Composable
@@ -93,10 +98,10 @@ fun MainScreen(navigateToNewActivity: () -> Unit) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = null,
-                modifier = Modifier.size(250.dp),
+                modifier = Modifier.size(300.dp),
                 contentScale = ContentScale.Fit
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Image(
                 painter = painterResource(id = R.drawable.playbutton),
                 contentDescription = null,
@@ -156,7 +161,7 @@ fun GreetingPreview() {
             CenteredLogo(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .size(300.dp)
+                    .size(350.dp)
             )
         }
     }
