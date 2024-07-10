@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -206,7 +207,7 @@ fun Content(selectedItem: Int) {
             Column {
                 Banner(imageRes = R.drawable.banner_doa)
                 DoaHarianContent(
-                    items = listOf("Doa 1", "Doa 2", "Doa 3", "Doa 4", "Doa 5", "Doa 6")
+                    items = listOf("Doa Makan", "Doa Naik Kendaraan", "Doa Sebelum Tidur", "Doa Bangun Tidur", "Doa Masuk Kamar Mandi", "Doa Keluar Kamar Mandi")
                 )
             }
         }
@@ -342,9 +343,10 @@ fun BubbleText(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(160.dp, 60.dp)
+            .clip(RoundedCornerShape(50.dp))
             .background(Color.White)
             .padding(8.dp)
-            .clip(RoundedCornerShape(50.dp))
+
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -388,45 +390,48 @@ fun AutoSizeText(text: String, maxFontSize: Int = 20) {
 
 @Composable
 fun DoaHarianContent(items: List<String>) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .border(BorderStroke(5.dp, Color.White))
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF617683),
-                        Color(0xFF4F5C63)
-                    )
-                )
-            )
-            .padding(20.dp)
-    ) {
-        DefaultScrollableContent(items = items)
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredItems = items.filter { it.contains(searchQuery, ignoreCase = true) }
+
+    Column {
+        SearchBar(
+            query = searchQuery,
+            onQueryChanged = { searchQuery = it }
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .padding(20.dp)
+
+        ) {
+            DoaHarianScrollableContent(items = filteredItems)
+        }
     }
 }
 
 @Composable
-fun DefaultScrollableContent(items: List<String>) {
+fun DoaHarianScrollableContent(items: List<String>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(items.chunked(3)) { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                rowItems.forEach { item ->
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Text(item, style = TextStyle(fontSize = 32.sp))
-                    }
-                }
-            }
+        items(items) { item ->
+            DoaHarianItem(item = item)
         }
+    }
+}
+
+@Composable
+fun DoaHarianItem(item: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp)) // Apply the clip modifier before the background
+            .background(Color.White)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(item, style = TextStyle(fontSize = 20.sp, color = Color.Black, fontStyle = FontStyle.Italic))
     }
 }
 
