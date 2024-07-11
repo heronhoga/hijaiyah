@@ -29,14 +29,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
+
 
 class ContentActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             HijaiyahTheme {
+                val navController = rememberNavController()
                 val selectedItem = remember { mutableStateOf(0) }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -57,8 +64,15 @@ class ContentActivity : ComponentActivity() {
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
-                        Column {
-                            Content(selectedItem = selectedItem.value)
+                        NavHost(navController = navController, startDestination = "main") {
+                            composable("main") {
+                                MainScreen(navController, selectedItem.value)
+                            }
+                            composable("doaDetail/{doaTitle}") { backStackEntry ->
+                                val doaTitle = backStackEntry.arguments?.getString("doaTitle")
+                                val doaItem = doaList.find { it.title == doaTitle }
+                                doaItem?.let { DoaDetailScreen(navController, it) }
+                            }
                         }
                     }
                 }
@@ -66,6 +80,15 @@ class ContentActivity : ComponentActivity() {
         }
     }
 }
+
+
+@Composable
+fun MainScreen(navController: NavHostController, selectedItem: Int) {
+    Column {
+        Content(navController = navController, selectedItem = selectedItem)
+    }
+}
+
 
 @Composable
 fun Banner(imageRes: Int) {
@@ -80,8 +103,9 @@ fun Banner(imageRes: Int) {
     )
 }
 
+
 @Composable
-fun Content(selectedItem: Int) {
+fun Content(navController: NavHostController, selectedItem: Int) {
     when (selectedItem) {
         0 -> {
             Column {
@@ -206,15 +230,14 @@ fun Content(selectedItem: Int) {
         2 -> {
             Column {
                 Banner(imageRes = R.drawable.banner_doa)
-                DoaHarianContent(
-                    items = listOf("Doa Makan", "Doa Naik Kendaraan", "Doa Sebelum Tidur", "Doa Bangun Tidur", "Doa Masuk Kamar Mandi", "Doa Keluar Kamar Mandi")
-                )
+                DoaHarianContent(navController = navController)
             }
         }
     }
 }
 
 data class AsmaulHusnaItem(val latin: String, val arabic: String, val meaning: String)
+
 
 @Composable
 fun HijaiyahContent(items: List<Pair<String, String>>) {
@@ -388,10 +411,18 @@ fun AutoSizeText(text: String, maxFontSize: Int = 20) {
     }
 }
 
+data class DoaItem(val title: String, val arabic: String, val latin: String, val meaning: String)
+
+val doaList = listOf(
+    DoaItem("Doa Makan", "بِسْمِ اللَّهِ", "Bismillah", "In the name of Allah"),
+    DoaItem("Doa Naik Kendaraan", "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا", "Subhanalladhi sakhkhara lana hatha", "Glory to Him who has subjected this to us"),
+    // Add more Doa items
+)
+
 @Composable
-fun DoaHarianContent(items: List<String>) {
+fun DoaHarianContent(navController: NavHostController) {
     var searchQuery by remember { mutableStateOf("") }
-    val filteredItems = items.filter { it.contains(searchQuery, ignoreCase = true) }
+    val filteredItems = doaList.filter { it.title.contains(searchQuery, ignoreCase = true) }
 
     Column {
         SearchBar(
@@ -403,35 +434,35 @@ fun DoaHarianContent(items: List<String>) {
                 .fillMaxWidth()
                 .padding(16.dp)
                 .padding(20.dp)
-
         ) {
-            DoaHarianScrollableContent(items = filteredItems)
+            DoaHarianScrollableContent(navController = navController, items = filteredItems)
         }
     }
 }
 
 @Composable
-fun DoaHarianScrollableContent(items: List<String>) {
+fun DoaHarianScrollableContent(navController: NavHostController, items: List<DoaItem>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            DoaHarianItem(item = item)
+            DoaHarianItem(navController = navController, item = item)
         }
     }
 }
 
 @Composable
-fun DoaHarianItem(item: String) {
+fun DoaHarianItem(navController: NavHostController, item: DoaItem) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)) // Apply the clip modifier before the background
+            .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable { navController.navigate("doaDetail/${item.title}") },
         contentAlignment = Alignment.Center
     ) {
-        Text(item, style = TextStyle(fontSize = 20.sp, color = Color.Black, fontStyle = FontStyle.Italic))
+        Text(item.title, style = TextStyle(fontSize = 20.sp, color = Color.Black, fontStyle = FontStyle.Italic))
     }
 }
 
@@ -479,6 +510,7 @@ fun BottomNavigationBar(selectedItem: Int, onItemSelected: (Int) -> Unit) {
     }
 }
 
+
 @Composable
 fun ShowAsmaulHusnaDialog(item: AsmaulHusnaItem, onDismiss: () -> Unit) {
     AlertDialog(
@@ -505,6 +537,7 @@ fun ShowAsmaulHusnaDialog(item: AsmaulHusnaItem, onDismiss: () -> Unit) {
 @Composable
 fun NewActivityPreview() {
     HijaiyahTheme {
+        val navController = rememberNavController()
         val selectedItem = remember { mutableStateOf(0) }
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -527,9 +560,43 @@ fun NewActivityPreview() {
                     modifier = Modifier.fillMaxSize()
                 )
                 Column {
-                    Content(selectedItem = selectedItem.value)
+                    Content(navController = navController, selectedItem = selectedItem.value)
                 }
             }
         }
     }
 }
+
+
+@Composable
+fun DoaDetailScreen(navController: NavHostController, doaItem: DoaItem) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(40.dp, 60.dp)
+            .background(color = Color(0xFF617683))
+            .border(8.dp, Color.White)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.backbtn),
+            contentDescription = "Back",
+            modifier = Modifier
+                .size(100.dp)
+                .clickable { navController.popBackStack() }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(doaItem.title, style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(doaItem.arabic, style = TextStyle(fontSize = 30.sp, color = Color.White) )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(doaItem.latin, style = TextStyle(fontSize = 20.sp, color = Color.LightGray))
+        Spacer(modifier = Modifier.height(16.dp))
+        Divider(color = Color.White, thickness = 1.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(doaItem.meaning, style = TextStyle(fontSize = 18.sp, color = Color.White))
+    }
+}
+
