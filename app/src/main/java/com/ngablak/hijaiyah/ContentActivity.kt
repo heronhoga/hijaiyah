@@ -414,9 +414,30 @@ fun AutoSizeText(text: String, maxFontSize: Int = 20) {
 data class DoaItem(val title: String, val arabic: String, val latin: String, val meaning: String)
 
 val doaList = listOf(
-    DoaItem("Doa Makan", "بِسْمِ اللَّهِ", "Bismillah", "In the name of Allah"),
-    DoaItem("Doa Naik Kendaraan", "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا", "Subhanalladhi sakhkhara lana hatha", "Glory to Him who has subjected this to us"),
-    // Add more Doa items
+    DoaItem("Doa Sebelum Tidur", "بِاسْمِكَا للَّهُمَ أَحْيَا وَ ِاسْمِكَا أَمُوتُ", "Bismika allahumma ahya wa bismika amut", "Dengan nama-Mu Ya Allah aku hidup dan dengan nama-Mu aku mati"),
+    DoaItem("Doa Bangun Tidur", "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ", "Alhamdulillahi al-ladhi ahyana ba'da ma amatana wa ilaihi-nnushur", "Segala puji bagi Allah yang telah mengembalikan kehidupan, mematikan kami, dan hanya kepada-Nya kami kembali"),
+    DoaItem("Doa sebelum makan", "اَللّٰهُمَّ بَارِكْ لَنَا فِيْمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ", "Allahumma baarik lanaa fiimaa rozaqtanaa wa qinaa 'adzaa bannaar", "Ya Allah, berkahilah kami dalam rezeki yang telah Engkau berikan kepada kami dan peliharalah kami dari siksa api neraka"),
+    DoaItem("Doa sesudah makan", "اَلْحَمْدُ ِللهِ الَّذِىْ اَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِيْنَ", "Alhamdulillahilladzi ath-amanaa wa saqoonaa wa ja'alanaa minal muslimiin", "Segala puji bagi Allah yang telah memberi kami makan dan minum serta menjadikan kami termasuk dari kaum Muslimin"),
+    DoaItem("Doa keluar rumah", "بِسْمِ اللهِ تَوَكَّلْتُ عَلَى اللهِ، لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ", "Bismillahhi tawakkaltu 'alallah, laa haula wa laa quwwata illa billaah", "Dengan menyebut nama Allah, aku bertawakal kepada Allah. Tiada daya dan kekuatan kecuali dengan Allah"),
+    DoaItem("Doa masuk rumah", "بِسْمِ اللهِ وَلَجْنَا وَبِسْمِ اللهِ خَرَجْنَا ، وَعَلَى اللهِ رَبَّنَا تَوَكَّلْنَا", "Bismillahi walajnaa wa bismillahi kharajnaa wa-alallaahi rabbina tawak-kalnaa", "Dengan nama Allah, kami masuk (ke rumah), dengan nama Allah, kami keluar (darinya) dan kepada Allah, kami berserah diri"),
+    DoaItem("Doa sebelum belajar", "رَضِتُ بِااللهِ رَبَا وَبِالْاِسْلاَمِ دِيْنَا وَبِمُحَمَّدٍ نَبِيَا وَرَسُوْلاَ رَبِّ زِدْ نِيْ عِلْمًـاوَرْزُقْنِـيْ فَهْمًـا", "Rodlittu billahiroba, Wabil islaamidiinaa, Wabimuhammadin nabiyyaa warasuula, Robbi zidnii ilmaan warzuqnii fahmaan", "Kami ridho Allah Swt sebagai Tuhanku, Islam sebagai agamaku, dan Nabi Muhammad sebagai Nabi dan Rasul, Ya Allah, tambahkanlah kepadaku ilmu dan berikanlah aku pengertian yang baik"),
+    DoaItem("Doa setelah selesai belajar", "اَللّٰهُمَّ اِنِّى اِسْتَوْدِعُكَ مَاعَلَّمْتَنِيْهِ فَارْدُدْهُ اِلَىَّ عِنْدَ حَاجَتِىْ وَلاَ تَنْسَنِيْهِ يَارَبَّ الْعَالَمِيْنَ", "Allaahumma innii astaudi'uka maa 'allamtaniihi fardud-hu ilayya 'inda haajatii wa laa tansaniihi yaa robbal 'alamiin", "Ya Allah, sesungguhnya aku menitipkan kepada Engkau ilmu-ilmu yang telah Engkau ajarkan kepadaku, dan kembalikanlah kepadaku sewaktu aku butuh kembali dan janganlah Engkau lupakan aku kepada ilmu itu wahai Tuhan seru sekalian alam"),
+    DoaItem("Doa sebelum mandi", "اَللّٰهُمَّ اغْفِرْلِى ذَنْبِى وَوَسِّعْ لِى فِىْ دَارِىْ وَبَارِكْ لِىْ فِىْ رِزْقِىْ", "Allahummaghfirlii dzambii wa wassi'lii fii daarii wa baarik lii fii rizqii", "Ya Allah ampunilah dosa kesalahanku dan berilah keluasaan di rumahku serta berkahilah pada rezekiku"),
+    DoaItem("Doa memakai pakaian", "بِسْمِ اللهِ اَللّٰهُمَّ اِنِّى اَسْأَلُكَ مِنْ خَيْرِهِ وَخَيْرِ مَاهُوَ لَهُ وَاَعُوْذُبِكَ مِنْ شَرِّهِ وَشَرِّمَا هُوَلَهُ", "Bismillaahi, Alloohumma innii as-aluka min khoirihi wa khoiri maa huwa lahuu wa'a'uu dzubika min syarrihi wa syarri maa huwa lahuu", "Dengan nama-Mu yaa Allah akku minta kepada Engkau kebaikan pakaian ini dan kebaikan apa yang ada padanya, dan aku berlindung kepada Engkau dari kejahatan pakaian ini dan kejahatan yang ada padanya"),
+    DoaItem("Doa memakai pakaian baru", "اَلْحَمْدُ لِلّٰهِ الَّذِىْ كَسَانِىْ هَذَا وَرَزَقَنِيْهِ مِنْ غَيْرِ حَوْلٍ مِنِّىْ وَلاَقُوَّةٍ", "Alhamdu lillaahil ladzii kasaanii haadzaa wa rozaqoniihi min ghoiri hawlim minni wa laa quwwatin", "Segala puji bagi Allah yang memberi aku pakaian ini dan memberi rizeki dengan tiada upaya dan kekuatan dariku"),
+    DoaItem("Doa menyambut pagi hari", "اَللّٰهُمَّ بِكَ اَصْبَحْنَا وَبِكَ اَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوْتُ وَاِلَيْكَ النُّشُوْرُ", "Alloohumma bika ashbahnaa wa bika amsainaa wa bika nahyaa wa bika namuutu wa ilaikan nusyuuru", "Ya Allah, karena Engkau kami mengalami waktu pagi dan waktu petang, dan karena Engkau kami hidup dan mati dan kepada-Mu juga kami akan kembali"),
+    DoaItem("Doa menyambut siang hari", "اَللّٰهُمَّ بِكَ اَمْسَيْنَا وَبِكَ اَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوْتُ وَاِلَيْكَ الْمَصِيْر", "Alloohumma bika amsainaa wa bika ashbahnaa wa bika nahyaa wa bika namuutu wa ilaikal mashiir", "Ya Allah, karena Engkau kami mengalami waktu petang dan waktu pagi, karena Engkau kami hidup dan mati dan kepada-Mu juga kami akan kembali"),
+    DoaItem("Doa masuk WC dan toilet", " اَللّٰهُمَّ اِنّىْ اَعُوْذُبِكَ مِنَ الْخُبُثِ وَالْخَبَآئِثِ", "Allahumma Innii a'uudzubika minal khubutsi wal khoaaitsi", "Ya Allah, aku berlindung pada-Mu dari godaan setan laki-laki dan setan perempuan"),
+    DoaItem("Doa keluar WC dan toilet", "غُفْرَانَكَ الْحَمْدُ ِللهِ الَّذِىْ اَذْهَبَ عَنّى اْلاَذَى وَعَافَانِى", "Ghufraanakal hamdu lillaahil ladzii adzhaba 'annil adzaa wa 'aafaanii", "Dengan mengharap ampunanMu, segala puji milik Allah yang telah menghilangkan kotoran dari badanku dan yang telah menyejahterakan"),
+    DoaItem("Doa sebelum wudhu", "نَوَيْتُ الْوُضُوْءَ لِرَفْعِ الْحَدَثِ اْلاَصْغَرِ فَرْضًا ِللهِ تَعَالَى", "Nawaitul wudhuu-a liraf'll hadatsil ashghari fardhal lilaahi ta'aalaa", "Saya niat berwudhu untuk menghilangkan hadast kecil fardu karena Allah"),
+    DoaItem("Doa setelah wudhu", "أَشْهَدُ أَنْ لآّاِلَهَ إِلاَّاللهُ وَحْدَهُ لاَشَرِيْكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًاعَبْدُهُ وَرَسُوْلُهُ. اللّهُمَّ اجْعَلْنِىْ مِنَ التَّوَّابِيْنَ وَاجْعَلْنِىْ مِنَ الْمُتَطَهِّرِيْنَ", "Asyhadu allâ ilâha illallâhu wahdahû lâ syarîka lahu wa asyhadu anna muhammadan 'abduhû wa rasûluhû, allâhummaj'alnî minat tawwâbîna waj'alnii minal mutathahhirîna", "Aku bersaksi bahwa tidak ada Tuhan selain Allah Yang Maha Esa, tidak ada sekutu bagi-Nya, dan aku bersaksi bahwa Nabi Muhammad adalah hamba dan utusan Allah. Ya Allah, jadikanlah aku termasuk dalam golongan orang-orang yang bertobat dan jadikanlah aku termasuk dalam golongan orang-orang yang bersuci (shalih)"),
+    DoaItem("Doa setelah mendengarkan adzan", "اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ وَالصَّلَاةِ الْقَائِمَةِ آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ وَابْعَثْهُ مَقَامًا مَحْمُودًا الَّذِي وَعَدْتَهُ اِنَكَ لاَ تُخْلِفُ اْلمِيْعَاد", "Allahumma rabba haadzihid da'watit taammah. Wash shalaatil qaa-imah. Aati muhammadal wasiilata wal fadhiilah, wab'atshu maqoomam mahmuudal ladzii wa'adtahu innaka la tukhliful mi'ad", "Ya Allah, Tuhan yang memiliki panggilan ini, yang sempurna dan memiliki salat yang didirikan. Berilah Nabi Muhammad wasilah dan keutamaan, serta kemuliaan dan derajat yang tinggi, dan angkatlah ia ke tempat yang terpuji sebagaimana yang Engkau telah janjikan"),
+    DoaItem("Doa ketika bercermin", "اَلْحَمْدُ ِللهِ كَمَا حَسَّنْتَ خَلْقِىْ فَحَسِّـنْ خُلُقِىْ", "Alhamdulillaahi kamaa hassanta kholqii fahassin khuluqii", "Segala puji bagi Allah, baguskanlah budi pekertiku sebagaimana Engkau telah membaguskan rupa wajahku"),
+    DoaItem("Doa untuk kedua orang tua", "رَّبِّ اغْفِرْلِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيراً", "Rabbighfirrlii waliwaalidayya warhamhumaa kamaa rabbayaanii shaghiira", "Ya Tuhanku, ampunilah dosaku dan dosa ayah serta ibuku, dan kasihilah mereka sebagaimana kasih mereka kepadaku sewaktu aku masih kecil"),
+    DoaItem("Doa selamat dunia akhirat", "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", "Rabbanaa aatinaa fiddunnyaa hasanah, wa fil aakhirati hasanah, waqinaa 'adzaa ban naar", "Ya Tuhan kami, berilah kami kebaikan hidup di dunia dan kebaikan hidup di akhirat, dan jagalah kami dari siksa api neraka"),
+    DoaItem("Doa naik kendaraan ", "سُبْحَانَ الَّذِىْ سَخَّرَلَنَا هَذَا وَمَاكُنَّالَهُ مُقْرِنِيْنَ وَاِنَّآ اِلَى رَبِّنَا لَمُنْقَلِبُوْنَ", "Subhaanalladzii sakkhara lanaa hadza wama kunna lahu muqriniin wa-inna ilaa rabbina lamunqalibuun", "Maha suci Allah yang telah menundukkan untuk kami (kendaraan) ini. padahal sebelumnya kami tidak mampu untuk menguasainya, dan hanya kepada-Mu lah kami akan kembali"),
+    DoaItem("Doa saat turun hujan", "اللَّهُمَّصَيِّباًنَافِعاً", "Allahumma shoyyiban nafi'an", "Ya Allah, turunkan lah pada kami hujan yang bermanfaat"),
+    DoaItem("Doa saat sakit", "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ اشْفِ أَنْتَ الشَّافِي لَا شَافِيَ إلَّا أَنْتَ شِفَاءً لَا يُغَادِرُ سَقْمًا", "Allahumma rabban nasi, adzhibil ba'sa. Isyi. Antas syafi. La syafiya illa anta syifa'an la yudhadiru saqaman", "Tuhanku, Tuhan manusia, hilangkanlah penyakit. Berikanlah kesembuhan karena Kau adalah penyembuh. Tiada yang dapat menyembuhkan penyakit kecuali Kau dengan kesembuhan yang tidak menyisakan rasa nyeri")
 )
 
 @Composable
@@ -584,19 +605,61 @@ fun DoaDetailScreen(navController: NavHostController, doaItem: DoaItem) {
             painter = painterResource(id = R.drawable.backbtn),
             contentDescription = "Back",
             modifier = Modifier
-                .size(100.dp)
+                .size(150.dp)
                 .clickable { navController.popBackStack() }
         )
+        HorizontalDivider(color = Color.White,
+            thickness = 5.dp)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(doaItem.title, style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic))
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(doaItem.arabic, style = TextStyle(fontSize = 30.sp, color = Color.White) )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(doaItem.latin, style = TextStyle(fontSize = 20.sp, color = Color.LightGray))
-        Spacer(modifier = Modifier.height(16.dp))
-        Divider(color = Color.White, thickness = 1.dp)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(doaItem.meaning, style = TextStyle(fontSize = 18.sp, color = Color.White))
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            item {
+                Text(
+                    doaItem.title,
+                    style = TextStyle(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    doaItem.arabic,
+                    style = TextStyle(
+                        fontSize = 30.sp,
+                        color = Color.White
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    doaItem.latin,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        color = Color.LightGray
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(
+                    color = Color.White,
+                    thickness = 1.dp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    doaItem.meaning,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        color = Color.White
+                    )
+                )
+            }
+        }
     }
 }
+
 
