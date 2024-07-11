@@ -633,7 +633,8 @@ fun DoaDetailScreen(navController: NavHostController, doaItem: DoaItem) {
                     doaItem.arabic,
                     style = TextStyle(
                         fontSize = 30.sp,
-                        color = Color.White
+                        color = Color.White,
+                        textAlign = TextAlign.Right
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
