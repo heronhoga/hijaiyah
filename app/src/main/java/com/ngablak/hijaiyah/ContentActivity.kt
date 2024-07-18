@@ -103,6 +103,25 @@ fun Banner(imageRes: Int) {
     )
 }
 
+@Composable
+fun CameraButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.camera_icon),
+            contentDescription = null,
+            modifier = Modifier
+                .size(150.dp)
+                .clickable(
+                    onClick = onClick
+                ),
+            contentScale = ContentScale.Fit
+        )
+    }
+}
 
 @Composable
 fun Content(navController: NavHostController, selectedItem: Int) {
@@ -110,6 +129,11 @@ fun Content(navController: NavHostController, selectedItem: Int) {
         0 -> {
             Column {
                 Banner(imageRes = R.drawable.banner_hijaiyah)
+                CameraButton(
+                    onClick = {
+                        println("Camera button clicked!")
+                    }
+                )
                 HijaiyahContent(
                     items = listOf(
                         "أ" to "Alif", "ب" to "Ba", "ت" to "Ta", "ث" to "Tha", "ج" to "Jim", "ح" to "Ha", "خ" to "Kha", "د" to "Dal", "ذ" to "Dhal",
