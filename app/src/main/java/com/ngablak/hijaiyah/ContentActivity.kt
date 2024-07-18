@@ -1,5 +1,6 @@
 package com.ngablak.hijaiyah
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +35,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
+import android.media.MediaPlayer
+import androidx.compose.ui.platform.LocalContext
 
 
 class ContentActivity : ComponentActivity() {
@@ -136,7 +139,7 @@ fun Content(navController: NavHostController, selectedItem: Int) {
                 )
                 HijaiyahContent(
                     items = listOf(
-                        "أ" to "Alif", "ب" to "Ba", "ت" to "Ta", "ث" to "Tha", "ج" to "Jim", "ح" to "Ha", "خ" to "Kha", "د" to "Dal", "ذ" to "Dhal",
+                        "أ" to "Alif", "ب" to "Ba", "ت" to "Ta", "ث" to "Tsa", "ج" to "Jim", "ح" to "Ha", "خ" to "Kha", "د" to "Dal", "ذ" to "Dhal",
                         "ر" to "Ra", "ز" to "Zay", "س" to "Sin", "ش" to "Shin", "ص" to "Sad", "ض" to "Dad", "ط" to "Ta", "ظ" to "Zha", "ع" to "Ain",
                         "غ" to "Ghain", "ف" to "Fa", "ق" to "Qaf", "ك" to "Kaf", "ل" to "Lam", "م" to "Mim", "ن" to "Nun", "ه" to "Ha", "و" to "Waw", "ي" to "Ya", "ء" to "Hamzah"
                     )
@@ -265,6 +268,7 @@ data class AsmaulHusnaItem(val latin: String, val arabic: String, val meaning: S
 
 @Composable
 fun HijaiyahContent(items: List<Pair<String, String>>) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -280,12 +284,12 @@ fun HijaiyahContent(items: List<Pair<String, String>>) {
             )
             .padding(20.dp)
     ) {
-        HijaiyahScrollableContent(items = items)
+        HijaiyahScrollableContent(context, items)
     }
 }
 
 @Composable
-fun HijaiyahScrollableContent(items: List<Pair<String, String>>) {
+fun HijaiyahScrollableContent(context: Context, items: List<Pair<String, String>>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -303,7 +307,11 @@ fun HijaiyahScrollableContent(items: List<Pair<String, String>>) {
                                 .size(60.dp)
                                 .clip(CircleShape)
                                 .background(Color.White)
-                                .padding(8.dp),
+                                .padding(8.dp)
+                                .clickable {
+                                    val mediaPlayer = MediaPlayer.create(context, getResId(context, item.second.lowercase()))
+                                    mediaPlayer?.start()
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(item.first, style = TextStyle(fontSize = 28.sp, color = Color.Black))
@@ -314,6 +322,10 @@ fun HijaiyahScrollableContent(items: List<Pair<String, String>>) {
             }
         }
     }
+}
+
+fun getResId(context: Context, name: String): Int {
+    return context.resources.getIdentifier(name, "raw", context.packageName)
 }
 
 @Composable
