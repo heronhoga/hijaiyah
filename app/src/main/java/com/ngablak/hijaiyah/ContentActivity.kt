@@ -140,8 +140,8 @@ fun Content(navController: NavHostController, selectedItem: Int) {
                 HijaiyahContent(
                     items = listOf(
                         "أ" to "Alif", "ب" to "Ba", "ت" to "Ta", "ث" to "Tsa", "ج" to "Jim", "ح" to "Ha", "خ" to "Kha", "د" to "Dal", "ذ" to "Dhal",
-                        "ر" to "Ra", "ز" to "Zay", "س" to "Sin", "ش" to "Shin", "ص" to "Sad", "ض" to "Dad", "ط" to "Ta", "ظ" to "Zha", "ع" to "Ain",
-                        "غ" to "Ghain", "ف" to "Fa", "ق" to "Qaf", "ك" to "Kaf", "ل" to "Lam", "م" to "Mim", "ن" to "Nun", "ه" to "Ha", "و" to "Waw", "ي" to "Ya", "ء" to "Hamzah"
+                        "ر" to "Ra", "ز" to "Zay", "س" to "Sin", "ش" to "Shin", "ص" to "Sad", "ض" to "Dad", "ط" to "To", "ظ" to "Zha", "ع" to "Ain",
+                        "غ" to "Ghain", "ف" to "Fa", "ق" to "Qaf", "ك" to "Kaf", "ل" to "Lam", "م" to "Mim", "ن" to "Nun", "ه" to "Ha", "و" to "Waw", "ي" to "Ya"
                     )
                 )
             }
