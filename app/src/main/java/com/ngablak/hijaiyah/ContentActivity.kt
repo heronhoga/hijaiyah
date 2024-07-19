@@ -71,11 +71,15 @@ class ContentActivity : ComponentActivity() {
                             composable("main") {
                                 MainScreen(navController, selectedItem.value)
                             }
+                            composable("capture") {
+                                CaptureScreen()
+                            }
                             composable("doaDetail/{doaTitle}") { backStackEntry ->
                                 val doaTitle = backStackEntry.arguments?.getString("doaTitle")
                                 val doaItem = doaList.find { it.title == doaTitle }
                                 doaItem?.let { DoaDetailScreen(navController, it) }
                             }
+
                         }
                     }
                 }
@@ -134,7 +138,7 @@ fun Content(navController: NavHostController, selectedItem: Int) {
                 Banner(imageRes = R.drawable.banner_hijaiyah)
                 CameraButton(
                     onClick = {
-                        println("Camera button clicked!")
+                        navController.navigate("capture")
                     }
                 )
                 HijaiyahContent(
@@ -697,6 +701,12 @@ fun DoaDetailScreen(navController: NavHostController, doaItem: DoaItem) {
             }
         }
     }
+}
+
+@Composable
+fun CaptureScreen() {
+    // Content of your CaptureScreen
+    Text(text = "Capture Activity")
 }
 
 
