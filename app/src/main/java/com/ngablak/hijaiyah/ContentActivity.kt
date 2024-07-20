@@ -37,6 +37,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
 import android.media.MediaPlayer
 import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import androidx.compose.runtime.Composable
 
 
 class ContentActivity : ComponentActivity() {
@@ -69,10 +71,7 @@ class ContentActivity : ComponentActivity() {
                         )
                         NavHost(navController = navController, startDestination = "main") {
                             composable("main") {
-                                MainScreen(navController, selectedItem.value)
-                            }
-                            composable("capture") {
-                                CaptureScreen()
+                                MainScreen(navController, selectedItem.value, ::navigateToCaptureActivity)
                             }
                             composable("doaDetail/{doaTitle}") { backStackEntry ->
                                 val doaTitle = backStackEntry.arguments?.getString("doaTitle")
@@ -86,15 +85,22 @@ class ContentActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun navigateToCaptureActivity() {
+        val intent = Intent(this, CaptureActivity::class.java)
+        startActivity(intent)
+    }
 }
+
 
 
 @Composable
-fun MainScreen(navController: NavHostController, selectedItem: Int) {
+fun MainScreen(navController: NavHostController, selectedItem: Int, onCameraButtonClick: () -> Unit) {
     Column {
-        Content(navController = navController, selectedItem = selectedItem)
+        Content(navController = navController, selectedItem = selectedItem, onCameraButtonClick)
     }
 }
+
 
 
 @Composable
@@ -131,16 +137,12 @@ fun CameraButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun Content(navController: NavHostController, selectedItem: Int) {
+fun Content(navController: NavHostController, selectedItem: Int, onCameraButtonClick: () -> Unit) {
     when (selectedItem) {
         0 -> {
             Column {
                 Banner(imageRes = R.drawable.banner_hijaiyah)
-                CameraButton(
-                    onClick = {
-                        navController.navigate("capture")
-                    }
-                )
+                CameraButton(onClick = onCameraButtonClick)
                 HijaiyahContent(
                     items = listOf(
                         "أ" to "Alif", "ب" to "Ba", "ت" to "Ta", "ث" to "Tsa", "ج" to "Jim", "ح" to "Ha", "خ" to "Kha", "د" to "Dal", "ذ" to "Dhal",
@@ -621,7 +623,7 @@ fun NewActivityPreview() {
                     modifier = Modifier.fillMaxSize()
                 )
                 Column {
-                    Content(navController = navController, selectedItem = selectedItem.value)
+                    Content(navController = navController, selectedItem = selectedItem.value, onCameraButtonClick = {})
                 }
             }
         }
@@ -703,10 +705,5 @@ fun DoaDetailScreen(navController: NavHostController, doaItem: DoaItem) {
     }
 }
 
-@Composable
-fun CaptureScreen() {
-    // Content of your CaptureScreen
-    Text(text = "Capture Activity")
-}
 
 
