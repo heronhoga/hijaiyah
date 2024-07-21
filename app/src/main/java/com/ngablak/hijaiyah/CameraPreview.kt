@@ -3,11 +3,9 @@ package com.ngablak.hijaiyah
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.camera.*
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.ui.platform.LocalLifecycleOwner
-
 
 @Composable
 fun CameraPreview(
@@ -16,11 +14,12 @@ fun CameraPreview(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     AndroidView(
-        factory = {
-        PreviewView(it).apply {
-            this.controller = controller
-            controller.bindToLifecycle(lifecycleOwner)
-        }
-    },
-        modifier = modifier)
+        factory = { context ->
+            PreviewView(context).apply {
+                this.controller = controller
+                controller.bindToLifecycle(lifecycleOwner)
+            }
+        },
+        modifier = modifier
+    )
 }
