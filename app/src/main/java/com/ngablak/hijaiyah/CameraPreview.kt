@@ -7,15 +7,14 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 
 @Composable
 fun CameraPreview(
-    controller: LifecycleCameraController,
     modifier: Modifier = Modifier
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -32,14 +31,14 @@ fun CameraPreview(
 
 private fun setupCamera(
     context: Context,
-    lifecycleOwner: androidx.lifecycle.LifecycleOwner,
+    lifecycleOwner: LifecycleOwner,
     previewView: PreviewView
 ) {
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
     cameraProviderFuture.addListener({
         val cameraProvider = cameraProviderFuture.get()
         val preview = Preview.Builder()
-            .setTargetResolution(android.util.Size(1280, 720))
+            .setTargetResolution(android.util.Size(1280, 720))  // Set target resolution to 1280x720
             .build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
@@ -52,6 +51,7 @@ private fun setupCamera(
             )
         } catch (exc: Exception) {
             // Handle exceptions
+            exc.printStackTrace()
         }
     }, ContextCompat.getMainExecutor(context))
 }
