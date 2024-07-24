@@ -38,7 +38,7 @@ private fun setupCamera(
     cameraProviderFuture.addListener({
         val cameraProvider = cameraProviderFuture.get()
         val preview = Preview.Builder()
-            .setTargetResolution(android.util.Size(1280, 720))  // Set target resolution to 1280x720
+            .setTargetResolution(android.util.Size(720, 1280))
             .build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }

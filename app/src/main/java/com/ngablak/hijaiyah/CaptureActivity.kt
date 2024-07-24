@@ -23,10 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.compose.ui.window.Dialog
 import com.google.common.util.concurrent.ListenableFuture
 import com.ngablak.hijaiyah.ml.ModelHijaiyah
 import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
@@ -47,6 +47,7 @@ class CaptureActivity : ComponentActivity() {
     private var imageCapture: ImageCapture? = null
     private var capturedBitmap: Bitmap? = null
     private var label by mutableStateOf("")
+    private var showDialog by mutableStateOf(false)
 
     private val numberToLabel = mapOf(
         0 to "alif",
@@ -92,10 +93,18 @@ class CaptureActivity : ComponentActivity() {
                 ) {
                     CameraPreview(
                         onCapture = { bitmap ->
-                            capturedBitmap = cropCenterSquare(bitmap, 128)
+                            capturedBitmap = cropToGuideBox(bitmap)
                             label = processFrame(capturedBitmap!!)
+                            showDialog = true
                         }
                     )
+                    if (showDialog) {
+                        PredictionDialog(
+                            imageBitmap = capturedBitmap!!.asImageBitmap(),
+                            label = label,
+                            onDismiss = { showDialog = false }
+                        )
+                    }
                 }
             }
         }
@@ -104,7 +113,6 @@ class CaptureActivity : ComponentActivity() {
     @Composable
     fun CameraPreview(onCapture: (Bitmap) -> Unit) {
         val context = LocalContext.current
-        val lifecycleOwner = LocalLifecycleOwner.current
         val previewView = remember { androidx.camera.view.PreviewView(context) }
         val capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -143,7 +151,7 @@ class CaptureActivity : ComponentActivity() {
 
         Canvas(modifier = Modifier.fillMaxSize()) {
             val boxColor = androidx.compose.ui.graphics.Color(color.toArgb())
-            val boxSize = 128.dp.toPx()
+            val boxSize = 256.dp.toPx()
             val centerX = size.width / 2
             val centerY = size.height / 2
 
@@ -153,6 +161,38 @@ class CaptureActivity : ComponentActivity() {
                 size = androidx.compose.ui.geometry.Size(boxSize, boxSize),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(width = 8f)
             )
+        }
+    }
+
+    @Composable
+    fun PredictionDialog(imageBitmap: androidx.compose.ui.graphics.ImageBitmap, label: String, onDismiss: () -> Unit) {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = 8.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = "Predicted Image",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .background(MaterialTheme.colorScheme.surface)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = label, style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { onDismiss() }) {
+                        Text(text = "OK")
+                    }
+                }
+            }
         }
     }
 
@@ -186,32 +226,53 @@ class CaptureActivity : ComponentActivity() {
         }
     }
 
-    private fun cropCenterSquare(bitmap: Bitmap, size: Int): Bitmap {
+    private fun cropToGuideBox(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
-        val newWidth = if (width > height) height else width
-        val newHeight = if (width > height) height else width
 
-        val cropW = (width - newWidth) / 2
-        val cropH = (height - newHeight) / 2
+        val boxSize = (width * 700) / 1280
+        val centerX = width / 2
+        val centerY = height / 2
+        val left = (centerX - boxSize / 2).toInt()
+        val top = (centerY - boxSize / 2).toInt()
 
-        return Bitmap.createBitmap(bitmap, cropW, cropH, size, size)
+        val croppedBitmap = Bitmap.createBitmap(bitmap, left, top, boxSize, boxSize)
+
+        val matrix = Matrix()
+        matrix.postRotate(90f)
+        val rotatedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.width, croppedBitmap.height, matrix, true)
+
+        return Bitmap.createScaledBitmap(rotatedBitmap, 128, 128, true)
     }
 
     private fun loadAndPreprocessImage(image: Bitmap): TensorBuffer {
-        val resizedImage = Bitmap.createScaledBitmap(image, 128, 128, true)
+        //Convert image to grayscale
+        val grayImage = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(grayImage)
+        val paint = Paint()
+        val colorMatrix = ColorMatrix()
+        colorMatrix.setSaturation(0f)
+        val filter = ColorMatrixColorFilter(colorMatrix)
+        paint.colorFilter = filter
+        canvas.drawBitmap(image, 0f, 0f, paint)
 
-        val byteBuffer = ByteBuffer.allocateDirect(128 * 128 * 1 * 4)
-        byteBuffer.order(ByteOrder.nativeOrder())
+        //Resize image to 128x128
+        val resizedImage = Bitmap.createScaledBitmap(grayImage, 128, 128, true)
 
+        //Create ByteBuffer and set to LITTLE_ENDIAN
+        val byteBuffer = ByteBuffer.allocateDirect(1 * 128 * 128 * 4)  // 1 batch, 128x128 image, 1 channel (grayscale), 4 bytes per float
+        byteBuffer.order(ByteOrder.nativeOrder())  // Set byte order to LITTLE_ENDIAN
+
+        //Normalize pixel values to [0, 1]
         for (y in 0 until 128) {
             for (x in 0 until 128) {
                 val pixel = resizedImage.getPixel(x, y)
-                val gray = android.graphics.Color.red(pixel).toFloat() / 255.0f
+                val gray = Color.red(pixel).toFloat() / 255.0f
                 byteBuffer.putFloat(gray)
             }
         }
 
+        //Load ByteBuffer into TensorBuffer
         val tensorBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 128, 128, 1), DataType.FLOAT32)
         tensorBuffer.loadBuffer(byteBuffer)
 
@@ -275,7 +336,6 @@ class CaptureActivity : ComponentActivity() {
             }
         )
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
