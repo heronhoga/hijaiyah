@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.widget.Toast
+import android.media.MediaPlayer
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.camera.core.*
@@ -48,17 +49,18 @@ class CaptureActivity : ComponentActivity() {
     private var capturedBitmap: Bitmap? = null
     private var label by mutableStateOf("")
     private var showDialog by mutableStateOf(false)
+    private var mediaPlayer: MediaPlayer? = null
 
     private val numberToLabel = mapOf(
         0 to "alif",
         1 to "ra",
-        2 to "zai",
+        2 to "zay",
         3 to "sin",
-        4 to "syin",
-        5 to "shad",
-        6 to "dhad",
-        7 to "tha",
-        8 to "dha",
+        4 to "shin",
+        5 to "sad",
+        6 to "dad",
+        7 to "to",
+        8 to "zha",
         9 to "ain",
         10 to "ghain",
         11 to "ba",
@@ -75,9 +77,9 @@ class CaptureActivity : ComponentActivity() {
         22 to "tsa",
         23 to "jim",
         24 to "ha",
-        25 to "kho",
+        25 to "kha",
         26 to "dal",
-        27 to "dzal"
+        27 to "dhal"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -215,6 +217,7 @@ class CaptureActivity : ComponentActivity() {
         Log.d("Accuracy", "Label: $predictedLabel, Confidence: $confidence")
 
         showToast("$predictedLabel: $confidence%")
+        playSound(predictedLabel)
         return "$predictedLabel: $confidence%"
     }
 
@@ -260,8 +263,8 @@ class CaptureActivity : ComponentActivity() {
         val resizedImage = Bitmap.createScaledBitmap(grayImage, 128, 128, true)
 
         //Create ByteBuffer and set to LITTLE_ENDIAN
-        val byteBuffer = ByteBuffer.allocateDirect(1 * 128 * 128 * 4)  // 1 batch, 128x128 image, 1 channel (grayscale), 4 bytes per float
-        byteBuffer.order(ByteOrder.nativeOrder())  // Set byte order to LITTLE_ENDIAN
+        val byteBuffer = ByteBuffer.allocateDirect(1 * 128 * 128 * 4)
+        byteBuffer.order(ByteOrder.nativeOrder())
 
         //Normalize pixel values to [0, 1]
         for (y in 0 until 128) {
@@ -337,9 +340,47 @@ class CaptureActivity : ComponentActivity() {
         )
     }
 
+    private fun playSound(label: String) {
+        val soundResId = when (label.split(":")[0].trim()) {
+            "alif" -> R.raw.alif
+            "ra" -> R.raw.ra
+            "zay" -> R.raw.zay
+            "sin" -> R.raw.sin
+            "shin" -> R.raw.shin
+            "sad" -> R.raw.sad
+            "dad" -> R.raw.dad
+            "to" -> R.raw.to
+            "zha" -> R.raw.zha
+            "ain" -> R.raw.ain
+            "ghain" -> R.raw.ghain
+            "ba" -> R.raw.ba
+            "fa" -> R.raw.fa
+            "qaf" -> R.raw.qaf
+            "kaf" -> R.raw.kaf
+            "lam" -> R.raw.lam
+            "mim" -> R.raw.mim
+            "nun" -> R.raw.nun
+            "hha" -> R.raw.hha
+            "waw" -> R.raw.waw
+            "ya" -> R.raw.ya
+            "ta" -> R.raw.ta
+            "tsa" -> R.raw.tsa
+            "jim" -> R.raw.jim
+            "ha" -> R.raw.ha
+            "kha" -> R.raw.kha
+            "dal" -> R.raw.dal
+            "dhal" -> R.raw.dhal
+            else -> return
+        }
+        mediaPlayer?.release()
+        mediaPlayer = MediaPlayer.create(this, soundResId)
+        mediaPlayer?.start()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
         toast?.cancel()
+        mediaPlayer?.release()
     }
 }
