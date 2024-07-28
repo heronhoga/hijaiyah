@@ -1,5 +1,6 @@
 package com.ngablak.hijaiyah
 
+import android.Manifest
 import android.graphics.*
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.window.Dialog
 import com.google.common.util.concurrent.ListenableFuture
@@ -33,6 +35,7 @@ import com.ngablak.hijaiyah.ml.ModelHijaiyah
 import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import android.content.pm.PackageManager
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -82,11 +85,69 @@ class CaptureActivity : ComponentActivity() {
         27 to "dhal"
     )
 
+    // Request code for camera permission
+    private val CAMERA_PERMISSION_REQUEST_CODE = 100
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tfliteModel = ModelHijaiyah.newInstance(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        setContent {
+            HijaiyahTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    if (checkCameraPermission()) {
+                        startCamera()
+                    } else {
+                        requestCameraPermission()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this, Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCameraPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this, Manifest.permission.CAMERA
+            )
+        ) {
+            Toast.makeText(this, "Camera permission is needed to use this app", Toast.LENGTH_SHORT).show()
+        } else {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            CAMERA_PERMISSION_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    startCamera()
+                } else {
+                    Toast.makeText(this, "Permission denied to use camera", Toast.LENGTH_SHORT).show()
+                }
+                return
+            }
+            else -> {
+            }
+        }
+    }
+
+    private fun startCamera() {
         setContent {
             HijaiyahTheme {
                 Surface(
@@ -249,7 +310,7 @@ class CaptureActivity : ComponentActivity() {
     }
 
     private fun loadAndPreprocessImage(image: Bitmap): TensorBuffer {
-        //Convert image to grayscale
+        // Convert image to grayscale
         val grayImage = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(grayImage)
         val paint = Paint()
@@ -259,14 +320,14 @@ class CaptureActivity : ComponentActivity() {
         paint.colorFilter = filter
         canvas.drawBitmap(image, 0f, 0f, paint)
 
-        //Resize image to 128x128
+        // Resize image to 128x128
         val resizedImage = Bitmap.createScaledBitmap(grayImage, 128, 128, true)
 
-        //Create ByteBuffer and set to LITTLE_ENDIAN
+        // Create ByteBuffer and set to LITTLE_ENDIAN
         val byteBuffer = ByteBuffer.allocateDirect(1 * 128 * 128 * 4)
         byteBuffer.order(ByteOrder.nativeOrder())
 
-        //Normalize pixel values to [0, 1]
+        // Normalize pixel values to [0, 1]
         for (y in 0 until 128) {
             for (x in 0 until 128) {
                 val pixel = resizedImage.getPixel(x, y)
@@ -275,7 +336,7 @@ class CaptureActivity : ComponentActivity() {
             }
         }
 
-        //Load ByteBuffer into TensorBuffer
+        // Load ByteBuffer into TensorBuffer
         val tensorBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 128, 128, 1), DataType.FLOAT32)
         tensorBuffer.loadBuffer(byteBuffer)
 
