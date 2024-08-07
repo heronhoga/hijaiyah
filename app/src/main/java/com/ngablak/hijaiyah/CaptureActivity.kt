@@ -1,6 +1,7 @@
 package com.ngablak.hijaiyah
 
 import android.Manifest
+import android.content.Context
 import android.graphics.*
 import android.os.Bundle
 import android.util.Log
@@ -36,7 +37,8 @@ import com.ngablak.hijaiyah.ui.theme.HijaiyahTheme
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import android.content.pm.PackageManager
-import java.io.File
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.ExecutorService
@@ -53,6 +55,7 @@ class CaptureActivity : ComponentActivity() {
     private var label by mutableStateOf("")
     private var showDialog by mutableStateOf(false)
     private var mediaPlayer: MediaPlayer? = null
+    private var isHorizontalDefault = false
 
     private val numberToLabel = mapOf(
         0 to "alif",
@@ -85,7 +88,6 @@ class CaptureActivity : ComponentActivity() {
         27 to "dhal"
     )
 
-    // Request code for camera permission
     private val CAMERA_PERMISSION_REQUEST_CODE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -184,6 +186,7 @@ class CaptureActivity : ComponentActivity() {
             cameraProviderFuture.addListener({
                 val cameraProvider = cameraProviderFuture.get()
                 bindPreview(cameraProvider, cameraSelector, previewView)
+                isHorizontalDefault = checkIfCameraIsHorizontal(context)
             }, ContextCompat.getMainExecutor(context))
         }
 
@@ -294,7 +297,7 @@ class CaptureActivity : ComponentActivity() {
         val width = bitmap.width
         val height = bitmap.height
 
-        val boxSize = (width * 700) / 1280
+        val boxSize = (width * 400) / 1280
         val centerX = width / 2
         val centerY = height / 2
         val left = (centerX - boxSize / 2).toInt()
@@ -302,11 +305,11 @@ class CaptureActivity : ComponentActivity() {
 
         val croppedBitmap = Bitmap.createBitmap(bitmap, left, top, boxSize, boxSize)
 
-        val matrix = Matrix()
-        matrix.postRotate(90f)
-        val rotatedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.width, croppedBitmap.height, matrix, true)
-
-        return Bitmap.createScaledBitmap(rotatedBitmap, 128, 128, true)
+        return if (isHorizontalDefault) {
+            rotateBitmap(croppedBitmap, 180f)
+        } else {
+            croppedBitmap
+        }
     }
 
     private fun loadAndPreprocessImage(image: Bitmap): TensorBuffer {
@@ -382,16 +385,19 @@ class CaptureActivity : ComponentActivity() {
     private fun takePhoto(onCapture: (Bitmap) -> Unit) {
         val imageCapture = imageCapture ?: return
 
-        val photoFile = File(externalMediaDirs.firstOrNull(), "${System.currentTimeMillis()}.jpg")
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
         imageCapture.takePicture(
-            outputOptions,
             ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                    onCapture(bitmap)
+            object : ImageCapture.OnImageCapturedCallback() {
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    val rotationDegrees = image.imageInfo.rotationDegrees
+                    val bitmap = imageProxyToBitmap(image)
+                    val adjustedBitmap = if (isHorizontalDefault) {
+                        rotateBitmap(bitmap, -90f)
+                    } else {
+                        bitmap
+                    }
+                    onCapture(adjustedBitmap)
+                    image.close()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -399,6 +405,32 @@ class CaptureActivity : ComponentActivity() {
                 }
             }
         )
+    }
+
+    private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+        val buffer = image.planes[0].buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degrees)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun checkIfCameraIsHorizontal(context: Context): Boolean {
+        val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
+        val cameraId = cameraManager.cameraIdList.firstOrNull { id ->
+            val characteristics = cameraManager.getCameraCharacteristics(id)
+            val facing = characteristics[CameraCharacteristics.LENS_FACING]
+            facing != null && facing == CameraCharacteristics.LENS_FACING_BACK
+        } ?: return false
+
+        val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+        val orientation = characteristics[CameraCharacteristics.SENSOR_ORIENTATION] ?: 0
+        return orientation == 90 || orientation == 270
     }
 
     private fun playSound(label: String) {

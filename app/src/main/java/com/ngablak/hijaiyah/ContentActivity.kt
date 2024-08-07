@@ -407,8 +407,8 @@ fun AsmaulHusnaScrollableContent(items: List<AsmaulHusnaItem>, onItemClick: (Asm
 fun BubbleText(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .size(160.dp, 60.dp)
-            .clip(RoundedCornerShape(50.dp))
+            .size(120.dp, 60.dp)
+            .clip(RoundedCornerShape(25.dp))
             .background(Color.White)
             .padding(8.dp)
 
@@ -420,7 +420,7 @@ fun BubbleText(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun AutoSizeText(text: String, maxFontSize: Int = 20) {
+fun AutoSizeText(text: String, maxFontSize: Int = 16) {
     var textSize by remember { mutableStateOf(maxFontSize.sp) }
     var readyToDraw by remember { mutableStateOf(false) }
 
@@ -433,7 +433,7 @@ fun AutoSizeText(text: String, maxFontSize: Int = 20) {
                 text = text,
                 style = TextStyle(fontSize = textSize, color = Color.Black),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(2.dp)
             )
         } else {
             Text(
